@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Análise Fiscal - M MAIA VIEIRA</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ApexCharts for interactive charts -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* Custom styles to complement Tailwind and enhance UI */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      /* slate-50 */
+    }
+
+    /* Custom sort icons for table headers */
+    .sort-icon {
+      opacity: 0.5;
+      transition: opacity 0.3s ease;
+    }
+
+    th:hover .sort-icon {
+      opacity: 1;
+    }
+
+    .sort-icon.active {
+      opacity: 1;
+      color: #10b981;
+      /* emerald-500 */
+    }
+
+    /* Custom ApexCharts Tooltip */
+    .apexcharts-tooltip {
+      background: #1e293b;
+      /* slate-800 */
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      border-radius: 8px;
+    }
+
+    /* Custom scrollbar for better aesthetics */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      /* slate-100 */
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      /* slate-300 */
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+      /* slate-400 */
+    }
+  </style>
+</head>
+
+<body class="text-slate-700 antialiased">
+  <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-br from-emerald-700 to-emerald-500 text-white p-8 md:p-10 rounded-2xl shadow-lg mb-8">
+      <div class="text-center">
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">Dashboard de Análise Fiscal</h1>
+        <p class="text-lg md:text-xl font-medium opacity-90">Cliente: M MAIA VIEIRA | CNPJ: 22.123.908/0001-25</p>
+      </div>
+    </header>
+
+    <!-- Consultant Info Section -->
+    <section class="bg-white p-6 rounded-2xl shadow-md mb-8 flex flex-col md:flex-row items-center gap-6 border border-slate-200">
+      <div class="flex-shrink-0 w-20 h-20 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-full flex items-center justify-center shadow-inner">
+        <i class="fa-solid fa-calculator text-4xl text-emerald-700"></i>
+      </div>
+      <div class="text-center md:text-left">
+        <h3 class="text-2xl font-bold text-slate-800 mb-1">Gilberto Negreiros Contabilidade & Consultoria</h3>
+        <p class="text-slate-500 font-medium text-lg mb-4">Especialista em recuperação de crédito tributário e otimização fiscal.</p>
+        <div class="flex justify-center md:justify-start gap-4 flex-wrap">
+          <a href="mailto:gnsjrcont@outlook.com" class="flex items-center gap-2 bg-slate-100 text-slate-700 font-semibold px-4 py-2 rounded-lg hover:bg-emerald-500 hover:text-white transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-1">
+            <i class="fas fa-envelope"></i> gnsjrcont@outlook.com
+          </a>
+          <a href="tel:+5598984812012" class="flex items-center gap-2 bg-slate-100 text-slate-700 font-semibold px-4 py-2 rounded-lg hover:bg-emerald-500 hover:text-white transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-1">
+            <i class="fas fa-phone"></i> (98) 98481-2012
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPIs Section -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-emerald-500 transform hover:-translate-y-1 transition-transform duration-300 flex items-center gap-4">
+        <div class="bg-emerald-100 text-emerald-600 rounded-full h-12 w-12 flex-shrink-0 flex items-center justify-center">
+          <i class="fa-solid fa-circle-check text-2xl"></i>
+        </div>
+        <div>
+          <p class="text-base font-semibold text-slate-500 mb-1">Total Restituído</p>
+          <p class="text-3xl font-extrabold text-emerald-600" id="kpi-restituido-valor">R$ 0,00</p>
+          <p class="text-slate-400 font-medium text-sm" id="kpi-restituido-proc">0 processos</p>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-amber-500 transform hover:-translate-y-1 transition-transform duration-300 flex items-center gap-4">
+        <div class="bg-amber-100 text-amber-600 rounded-full h-12 w-12 flex-shrink-0 flex items-center justify-center">
+          <i class="fa-solid fa-clock text-2xl"></i>
+        </div>
+        <div>
+          <p class="text-base font-semibold text-slate-500 mb-1">Valor Pendente</p>
+          <p class="text-3xl font-extrabold text-amber-600" id="kpi-pendente-valor">R$ 0,00</p>
+          <p class="text-slate-400 font-medium text-sm" id="kpi-pendente-proc">0 processos</p>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-slate-500 transform hover:-translate-y-1 transition-transform duration-300 flex items-center gap-4">
+        <div class="bg-slate-100 text-slate-600 rounded-full h-12 w-12 flex-shrink-0 flex items-center justify-center">
+          <i class="fa-solid fa-coins text-2xl"></i>
+        </div>
+        <div>
+          <p class="text-base font-semibold text-slate-500 mb-1">Total Geral</p>
+          <p class="text-3xl font-extrabold text-slate-600" id="kpi-geral-valor">R$ 0,00</p>
+          <p class="text-slate-400 font-medium text-sm" id="kpi-geral-proc">0 processos</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200 col-span-1 lg:col-span-1 min-h-[350px]">
+        <h3 class="text-xl font-bold text-slate-800 mb-4">Valores por Tributo</h3>
+        <div id="tributeChart"></div>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200 col-span-1 lg:col-span-1 min-h-[350px]">
+        <h3 class="text-xl font-bold text-slate-800 mb-4">Composição de Status</h3>
+        <div id="statusChart"></div>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200 col-span-1 lg:col-span-1 min-h-[350px]">
+        <h3 class="text-xl font-bold text-slate-800 mb-4">Taxa de Sucesso (Valor)</h3>
+        <div id="successRateChart"></div>
+      </div>
+    </section>
+
+    <!-- Detailed Table Section -->
+    <section class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        <h3 class="text-2xl font-bold text-slate-800">Consulta Detalhada</h3>
+        <div class="flex items-center gap-2 flex-wrap justify-center">
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="searchInput" placeholder="Pesquisar..." class="w-full md:w-48 pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
+          </div>
+          <select id="regimeFilter" class="py-2 px-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
+            <option value="">Todos Regimes</option>
+          </select>
+          <select id="tributoFilter" class="py-2 px-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
+            <option value="">Todos Tributos</option>
+          </select>
+          <select id="statusFilter" class="py-2 px-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
+            <option value="">Todas Situações</option>
+          </select>
+          <button id="clearFiltersBtn" class="bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-slate-700 transition-all shadow-sm hover:shadow-md">
+            <i class="fas fa-times mr-1"></i> Limpar
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table id="dataTable" class="w-full text-left">
+          <thead class="bg-slate-100">
+            <tr>
+              <th class="p-4 font-bold uppercase text-slate-500 text-sm tracking-wider cursor-pointer" data-column="tributo">Tributo <i class="fas fa-sort sort-icon"></i></th>
+              <th class="p-4 font-bold uppercase text-slate-500 text-sm tracking-wider cursor-pointer" data-column="situacao">Status <i class="fas fa-sort sort-icon"></i></th>
+              <th class="p-4 font-bold uppercase text-slate-500 text-sm tracking-wider cursor-pointer text-right" data-column="valor">Valor <i class="fas fa-sort sort-icon"></i></th>
+              <th class="p-4 font-bold uppercase text-slate-500 text-sm tracking-wider cursor-pointer" data-column="regime">Regime <i class="fas fa-sort sort-icon"></i></th>
+              <th class="p-4 font-bold uppercase text-slate-500 text-sm tracking-wider cursor-pointer" data-column="perdcomp">PER/DCOMP <i class="fas fa-sort sort-icon"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data rows will be injected here by JavaScript -->
+          </tbody>
+        </table>
+        <div id="no-results" class="hidden text-center p-8 text-slate-500">
+          <i class="fas fa-inbox fa-3x mb-4 text-slate-300"></i>
+          <p class="font-semibold">Nenhum resultado encontrado.</p>
+          <p class="text-sm">Tente ajustar seus filtros ou limpar a pesquisa.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // --- DATA SOURCE ---
+      const RAW_DATA = {
+        lucroPresumido: [{
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012229121217200'",
+          "valor": 3315.61,
+          "perdcomp": "00756.48251.270325.1.2.04-9198"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012430915761540'",
+          "valor": 707.58,
+          "perdcomp": "01123.20375.270325.1.2.04-8100"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012214363544906'",
+          "valor": 3767.31,
+          "perdcomp": "01478.67600.270325.1.2.04-9929"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707903057444'",
+          "valor": 4131.76,
+          "perdcomp": "01917.88040.270325.1.2.04-3110"
+        }, {
+          "tributo": "IRPJ DIVIDA ATIVA",
+          "situacao": "PENDENTE",
+          "darf": "7172119401705415'",
+          "valor": 548.03,
+          "perdcomp": "01977.08057.280325.1.2.04-8129"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162132724254884'",
+          "valor": 894.61,
+          "perdcomp": "02472.31484.270325.1.2.04-7443"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707788115120'",
+          "valor": 688.08,
+          "perdcomp": "03138.86854.270325.1.2.04-4579"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123708007139760'",
+          "valor": 730.33,
+          "perdcomp": "04783.25381.270325.1.2.04-1696"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100406136000547'",
+          "valor": 3657.39,
+          "perdcomp": "05196.88078.270325.1.2.04-7755"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012414166750344'",
+          "valor": 720.91,
+          "perdcomp": "05582.40983.270325.1.2.04-9158"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012211207374786'",
+          "valor": 3422.03,
+          "perdcomp": "06294.00981.270325.1.2.04-7696"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012435569965082'",
+          "valor": 2921,
+          "perdcomp": "06315.17916.270325.1.2.04-3780"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012417325733273'",
+          "valor": 627.57,
+          "perdcomp": "06495.71284.270325.1.2.04-1089"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162303952176933'",
+          "valor": 553.56,
+          "perdcomp": "07011.86861.270325.1.2.04-7230"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707836139966'",
+          "valor": 976.75,
+          "perdcomp": "07645.60732.270325.1.2.04-9223"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012414166747823'",
+          "valor": 3327.27,
+          "perdcomp": "07900.99048.270325.1.2.04-0673"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012211207375073'",
+          "valor": 741.44,
+          "perdcomp": "08248.31024.270325.1.2.04-7266"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012235028342771'",
+          "valor": 2989.73,
+          "perdcomp": "08729.87215.270325.1.2.04-3781"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100107128083753'",
+          "valor": 781.72,
+          "perdcomp": "08862.13592.270325.1.2.04-0086"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162222444655225'",
+          "valor": 4669.64,
+          "perdcomp": "08862.41949.270325.1.2.04-9762"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012408027343990'",
+          "valor": 2724.56,
+          "perdcomp": "09057.01954.270325.1.2.04-6142"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012232297211256'",
+          "valor": 577.23,
+          "perdcomp": "09545.07988.270325.1.2.04-2895"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012408027344628'",
+          "valor": 498.02,
+          "perdcomp": "09692.41492.270325.1.2.04-9711"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162132724254884'",
+          "valor": 933.15,
+          "perdcomp": "10163.37115.270325.1.2.04-4194"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162212690508678'",
+          "valor": 732.91,
+          "perdcomp": "10532.43386.270325.1.2.04-4450"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162132724254884'",
+          "valor": 4128.96,
+          "perdcomp": "10575.56176.270325.1.2.04-7498"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707744061503'",
+          "valor": 4636.63,
+          "perdcomp": "10753.99028.270325.1.2.04-6921"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162222444642220'",
+          "valor": 1011.75,
+          "perdcomp": "11083.55885.270325.1.2.04-0270"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707788115121'",
+          "valor": 3175.86,
+          "perdcomp": "11145.07743.270325.1.2.04-4785"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162132724254884'",
+          "valor": 4352.4,
+          "perdcomp": "11616.83268.270325.1.2.04-7299"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012435569965198'",
+          "valor": 632.88,
+          "perdcomp": "11777.69827.270325.1.2.04-3140"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707836139965'",
+          "valor": 4508.06,
+          "perdcomp": "12193.78031.270325.1.2.04-8173"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100406136000548'",
+          "valor": 792.43,
+          "perdcomp": "12402.83740.270325.1.2.04-6975"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012430915761515'",
+          "valor": 3265.73,
+          "perdcomp": "12518.06320.270325.1.2.04-2289"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707881156332'",
+          "valor": 837.95,
+          "perdcomp": "13082.91890.270325.1.2.04-5133"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707964119054'",
+          "valor": 840.29,
+          "perdcomp": "13110.82064.270325.1.2.04-1606"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707984113664'",
+          "valor": 1034.64,
+          "perdcomp": "14122.82180.270325.1.2.04-8770"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100406160000695'",
+          "valor": 997.1,
+          "perdcomp": "14789.79686.270325.1.2.04-5059"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707766097842'",
+          "valor": 832.73,
+          "perdcomp": "15089.96141.270325.1.2.04-1294"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012411021923014'",
+          "valor": 2955.05,
+          "perdcomp": "15385.58251.270325.1.2.04-9805"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707724075334'",
+          "valor": 1050.71,
+          "perdcomp": "16400.48309.270325.1.2.04-0053"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707943135579'",
+          "valor": 2980.41,
+          "perdcomp": "17053.72265.270325.1.2.04-0902"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707903057446'",
+          "valor": 895.21,
+          "perdcomp": "18255.59088.270325.1.2.04-5719"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162132724254884'",
+          "valor": 4306.87,
+          "perdcomp": "18985.13071.270325.1.2.04-0069"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012235028343263'",
+          "valor": 647.76,
+          "perdcomp": "20305.70641.270325.1.2.04-7343"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707724075332'",
+          "valor": 4849.46,
+          "perdcomp": "21288.20684.270325.1.2.04-7413"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012232297210896'",
+          "valor": 2664.13,
+          "perdcomp": "21618.84225.270325.1.2.04-3996"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707766097843'",
+          "valor": 3843.4,
+          "perdcomp": "22163.29720.270325.1.2.04-9107"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100107105061799'",
+          "valor": 689.61,
+          "perdcomp": "22419.58900.270325.1.2.04-9871"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123708034119527'",
+          "valor": 756.61,
+          "perdcomp": "22821.85843.270325.1.2.04-4934"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100405799000593'",
+          "valor": 4624.65,
+          "perdcomp": "23378.57296.270325.1.2.04-2690"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707922123669'",
+          "valor": 3554.66,
+          "perdcomp": "23847.28949.270325.1.2.04-4745"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012223495000953'",
+          "valor": 3244.74,
+          "perdcomp": "24259.58732.270325.1.2.04-8885"
+        }, {
+          "tributo": "IRPJ DIVIDA ATIVA",
+          "situacao": "PENDENTE",
+          "darf": "7172119401705415'",
+          "valor": 2635.41,
+          "perdcomp": "24550.32736.270325.1.2.04-1543"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100406089000512'",
+          "valor": 853.13,
+          "perdcomp": "24631.57216.270325.1.2.04-1242"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012421112267761'",
+          "valor": 3800.79,
+          "perdcomp": "24921.95608.270325.1.2.04-6182"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123708007139761'",
+          "valor": 3370.76,
+          "perdcomp": "25531.98928.270325.1.2.04-0148"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162303952176933'",
+          "valor": 2554.85,
+          "perdcomp": "26385.04842.270325.1.2.04-9960"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012502172005607'",
+          "valor": 632.86,
+          "perdcomp": "27841.53720.270325.1.2.04-0630"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012502172005275'",
+          "valor": 2920.91,
+          "perdcomp": "27943.34518.270325.1.2.04-1630"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100406160000696'",
+          "valor": 4602.05,
+          "perdcomp": "28446.42834.270325.1.2.04-6604"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012217110114444'",
+          "valor": 932.11,
+          "perdcomp": "28997.32686.270325.1.2.04-8735"
+        }, {
+          "tributo": "IRPJ DIVIDA ATIVA",
+          "situacao": "PENDENTE",
+          "darf": "7172119401705415'",
+          "valor": 5251.25,
+          "perdcomp": "29271.18254.270325.1.2.04-6567"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012423420879357'",
+          "valor": 657.73,
+          "perdcomp": "29971.88087.270325.1.2.04-4139"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012214363545600'",
+          "valor": 816.24,
+          "perdcomp": "30108.42298.270325.1.2.04-7024"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012223495000902'",
+          "valor": 703.02,
+          "perdcomp": "30574.78834.270325.1.2.04-7956"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012226243685662'",
+          "valor": 926.93,
+          "perdcomp": "30942.14102.270325.1.2.04-7985"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012421112267923'",
+          "valor": 823.49,
+          "perdcomp": "31196.56577.270325.1.2.04-5079"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012432637935150'",
+          "valor": 3015.99,
+          "perdcomp": "31267.24207.270325.1.2.04-8002"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123708034119528'",
+          "valor": 3492.08,
+          "perdcomp": "31900.91777.270325.1.2.04-7200"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162121707529212'",
+          "valor": 3320.21,
+          "perdcomp": "32445.65349.270325.1.2.04-2060"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162212690508678'",
+          "valor": 3382.66,
+          "perdcomp": "32786.31667.270325.1.2.04-4632"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012423420878903'",
+          "valor": 3035.7,
+          "perdcomp": "32952.26968.270325.1.2.04-5752"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012229121217650'",
+          "valor": 718.38,
+          "perdcomp": "33020.10721.270325.1.2.04-5172"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162215379586918'",
+          "valor": 790.25,
+          "perdcomp": "33472.89572.270325.1.2.04-6132"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012417325733168'",
+          "valor": 2896.51,
+          "perdcomp": "33932.39935.270325.1.2.04-2236"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707964119055'",
+          "valor": 3878.33,
+          "perdcomp": "34097.96500.270325.1.2.04-1330"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100406089000513'",
+          "valor": 3937.5,
+          "perdcomp": "34193.10679.270325.1.2.04-0193"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100106999066190'",
+          "valor": 645.76,
+          "perdcomp": "34243.64417.270325.1.2.04-0303"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707744061502'",
+          "valor": 1004.6,
+          "perdcomp": "35091.60230.270325.1.2.04-4336"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012411021923146'",
+          "valor": 640.25,
+          "perdcomp": "35139.10338.270325.1.2.04-8010"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707984113665'",
+          "valor": 4775.33,
+          "perdcomp": "35621.39187.270325.1.2.04-9883"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707922123673'",
+          "valor": 770.17,
+          "perdcomp": "36134.13958.270325.1.2.04-7521"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707812160195'",
+          "valor": 2863.76,
+          "perdcomp": "36878.31357.270325.1.2.04-7907"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012217110113758'",
+          "valor": 4302.12,
+          "perdcomp": "37063.92724.270325.1.2.04-1321"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10123707881156331'",
+          "valor": 3867.53,
+          "perdcomp": "37118.58002.270325.1.2.04-7200"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012432637935630'",
+          "valor": 653.46,
+          "perdcomp": "37227.27578.270325.1.2.04-0241"
+        }, {
+          "tributo": "IRPJ DIVIDA ATIVA",
+          "situacao": "PENDENTE",
+          "darf": "7172119401705415'",
+          "valor": 9080.38,
+          "perdcomp": "38553.15842.270325.1.2.04-0071"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012405360763864'",
+          "valor": 2290.57,
+          "perdcomp": "39300.44357.270325.1.2.04-5689"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012226243685360'",
+          "valor": 4278.14,
+          "perdcomp": "40048.67925.270325.1.2.04-9491"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012426849281044'",
+          "valor": 296.49,
+          "perdcomp": "40462.03849.270325.1.2.04-1566"
+        }, {
+          "tributo": "IRPJ DIVIDA ATIVA",
+          "situacao": "PENDENTE",
+          "darf": "7172119401705415'",
+          "valor": 1644.09,
+          "perdcomp": "40683.70404.280325.1.2.04-4087"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "10100405799000592'",
+          "valor": 1002.02,
+          "perdcomp": "41982.64726.270325.1.2.04-1311"
+        }, {
+          "tributo": "COFINS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7162215379586918'",
+          "valor": 3647.36,
+          "perdcomp": "42033.30830.270325.1.2.04-2881"
+        }, {
+          "tributo": "PIS",
+          "situacao": "RESTITUÍDO",
+          "darf": "7012405360764038'",
+          "valor": 496.28,
+          "perdcomp": "42636.36081.270325.1.2.04-0127"
+        }],
+        simplesNacional: {
+          data: [{
+            mes: "01/2023",
+            pis: 88.58,
+            cofins: 408.88
+          }, {
+            mes: "02/2023",
+            pis: 104.34,
+            cofins: 481.65
+          }, {
+            mes: "03/2023",
+            pis: 131.76,
+            cofins: 608.17
+          }, {
+            mes: "04/2023",
+            pis: 138.23,
+            cofins: 638.07
+          }, {
+            mes: "05/2023",
+            pis: 169.33,
+            cofins: 781.62
+          }, {
+            mes: "06/2023",
+            pis: 177.22,
+            cofins: 818.06
+          }, {
+            mes: "08/2023",
+            pis: 198.07,
+            cofins: 914.22
+          }, {
+            mes: "09/2023",
+            pis: 143.29,
+            cofins: 661.41
+          }, {
+            mes: "10/2023",
+            pis: 172.3,
+            cofins: 795.34
+          }, {
+            mes: "11/2023",
+            pis: 188.99,
+            cofins: 872.38
+          }, {
+            mes: "12/2023",
+            pis: 195.56,
+            cofins: 902.72
+          }],
+          processos: ["10320-722.770/2025-12", "10320-722.771/2025-59", "10320-722.772/2025-01", "10320-722.773/2025-48", "10320-722.774/2025-92", "10320-722.775/2025-37", "10320-722.776/2025-81", "10320-722.777/2025-26", "10320-722.778/2025-71", "10320-722.780/2025-40", "10320-722.781/2025-94"],
+          darfs: ["7202307596610530", "7202310925371290", "7202313797091660", "7202317040139580", "7202319802934420", "7202322978249550", "7202326297788470", "7202329149090680", "7202332126099250", "7202335245865280", "7202401763449610"]
+        }
+      };
+      // --- STATE MANAGEMENT ---
+      let masterData = [];
+      let filteredData = [];
+      let sortConfig = {
+        column: 'valor',
+        direction: 'desc'
+      };
+      // --- CHART INSTANCES ---
+      let tributeChart, statusChart, successRateChart;
+      // --- UTILITY & STATE FUNCTIONS ---
+      const formatCurrency = (value) => {
+        if (isNaN(value) || value === null) return new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        }).format(0);
+        return new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        }).format(value);
+      };
+
+      function saveState() {
+        const state = {
+          filters: {
+            search: document.getElementById('searchInput').value,
+            regime: document.getElementById('regimeFilter').value,
+            tributo: document.getElementById('tributoFilter').value,
+            status: document.getElementById('statusFilter').value,
+          },
+          sort: sortConfig
+        };
+        localStorage.setItem('dashboardFiscalState', JSON.stringify(state));
+      }
+
+      function loadState() {
+        const savedState = localStorage.getItem('dashboardFiscalState');
+        if (savedState) {
+          const state = JSON.parse(savedState);
+          document.getElementById('searchInput').value = state.filters.search || '';
+          document.getElementById('regimeFilter').value = state.filters.regime || '';
+          document.getElementById('tributoFilter').value = state.filters.tributo || '';
+          document.getElementById('statusFilter').value = state.filters.status || '';
+          sortConfig = state.sort || {
+            column: 'valor',
+            direction: 'desc'
+          };
+        }
+      }
+
+      function clearStateAndFilters() {
+        localStorage.removeItem('dashboardFiscalState');
+        document.getElementById('searchInput').value = '';
+        document.getElementById('regimeFilter').value = '';
+        document.getElementById('tributoFilter').value = '';
+        document.getElementById('statusFilter').value = '';
+        sortConfig = {
+          column: 'valor',
+          direction: 'desc'
+        };
+        applyFiltersAndRender();
+      }
+      // --- DATA TRANSFORMATION ---
+      function processRawData() {
+        const lucroPresumidoData = RAW_DATA.lucroPresumido.map(item => ({
+          ...item,
+          regime: 'Lucro Presumido'
+        }));
+        const simplesNacionalData = [];
+        const sn = RAW_DATA.simplesNacional;
+        sn.data.forEach((item, index) => {
+          simplesNacionalData.push({
+            tributo: 'PIS',
+            situacao: 'PENDENTE',
+            valor: item.pis,
+            darf: sn.darfs[index] || 'N/A',
+            perdcomp: sn.processos[index] || 'N/A',
+            regime: 'Simples Nacional'
+          });
+          simplesNacionalData.push({
+            tributo: 'COFINS',
+            situacao: 'PENDENTE',
+            valor: item.cofins,
+            darf: sn.darfs[index] || 'N/A',
+            perdcomp: sn.processos[index] || 'N/A',
+            regime: 'Simples Nacional'
+          });
+        });
+        masterData = [...lucroPresumidoData, ...simplesNacionalData];
+      }
+      // --- CHART CONFIGURATION & INITIALIZATION ---
+      function getChartOptions() {
+        const commonOptions = {
+          chart: {
+            fontFamily: 'Inter, sans-serif',
+            toolbar: {
+              show: false
+            },
+            animations: {
+              enabled: true,
+              easing: 'easeinout',
+              speed: 600,
+              animateGradually: {
+                enabled: true,
+                delay: 150
+              },
+              dynamicAnimation: {
+                enabled: true,
+                speed: 350
+              }
+            }
+          }
+        };
+        const tributeChartOptions = {
+          ...commonOptions,
+          series: [],
+          labels: [],
+          chart: {
+            ...commonOptions.chart,
+            type: 'donut',
+            height: 300
+          },
+          plotOptions: {
+            pie: {
+              expandOnClick: true,
+              donut: {
+                size: '70%',
+                labels: {
+                  show: true,
+                  value: {
+                    formatter: (val) => formatCurrency(parseFloat(val)),
+                    fontSize: '20px',
+                    fontWeight: 600,
+                    color: '#334155'
+                  },
+                  total: {
+                    show: true,
+                    showAlways: true,
+                    label: 'Total Filtrado',
+                    fontSize: '14px',
+                    color: '#64748b',
+                    formatter: (w) => {
+                      const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                      return formatCurrency(total);
+                    }
+                  }
+                }
+              }
+            }
+          },
+          dataLabels: {
+            enabled: true,
+            formatter: (val) => `${val.toFixed(1)}%`,
+            style: {
+              fontSize: '12px'
+            },
+            dropShadow: {
+              enabled: false
+            }
+          },
+          legend: {
+            position: 'bottom',
+            fontSize: '13px',
+            fontWeight: 500,
+            itemMargin: {
+              horizontal: 8,
+              vertical: 4
+            }
+          },
+          colors: ['#10b981', '#34d399', '#64748b', '#0ea5e9', '#f59e0b', '#fbbf24', '#a855f7'],
+          stroke: {
+            show: true,
+            width: 3,
+            colors: ['#f8fafc']
+          },
+          tooltip: {
+            y: {
+              formatter: (val) => formatCurrency(val)
+            },
+            theme: 'dark'
+          },
+          responsive: [{
+            breakpoint: 480,
+            options: {
+              chart: {
+                width: '100%'
+              },
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }]
+        };
+        const statusChartOptions = {
+          ...commonOptions,
+          series: [{
+            name: 'Valor',
+            data: []
+          }],
+          chart: {
+            ...commonOptions.chart,
+            type: 'bar',
+            height: 300
+          },
+          plotOptions: {
+            bar: {
+              borderRadius: 6,
+              columnWidth: '55%',
+              distributed: true
+            }
+          },
+          dataLabels: {
+            enabled: false
+          },
+          xaxis: {
+            categories: [],
+            labels: {
+              style: {
+                colors: '#64748b',
+                fontWeight: 500
+              }
+            }
+          },
+          yaxis: {
+            labels: {
+              formatter: (val) => formatCurrency(val).replace(/\,00$/, '').replace('R$', '').trim(),
+              style: {
+                colors: '#64748b'
+              }
+            }
+          },
+          colors: ['#10b981', '#f59e0b'],
+          grid: {
+            borderColor: '#e2e8f0',
+            strokeDashArray: 4
+          },
+          legend: {
+            show: false
+          },
+          tooltip: {
+            theme: 'dark',
+            y: {
+              formatter: (val) => formatCurrency(val)
+            }
+          }
+        };
+        const successRateChartOptions = {
+          ...commonOptions,
+          series: [0],
+          chart: {
+            ...commonOptions.chart,
+            type: 'radialBar',
+            height: 300
+          },
+          plotOptions: {
+            radialBar: {
+              hollow: {
+                size: '65%'
+              },
+              track: {
+                background: '#f1f5f9'
+              },
+              dataLabels: {
+                name: {
+                  show: true,
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: '#64748b'
+                },
+                value: {
+                  fontSize: '32px',
+                  fontWeight: 800,
+                  color: '#334155',
+                  formatter: (val) => `${val.toFixed(1)}%`
+                }
+              }
+            }
+          },
+          colors: ['#10b981'],
+          stroke: {
+            lineCap: 'round'
+          },
+          labels: ['Taxa de Sucesso'],
+          tooltip: {
+            theme: 'dark'
+          }
+        };
+        return {
+          tributeChartOptions,
+          statusChartOptions,
+          successRateChartOptions
+        };
+      }
+      async function init() {
+        const {
+          tributeChartOptions,
+          statusChartOptions,
+          successRateChartOptions
+        } = getChartOptions();
+        tributeChart = new ApexCharts(document.querySelector("#tributeChart"), tributeChartOptions);
+        statusChart = new ApexCharts(document.querySelector("#statusChart"), statusChartOptions);
+        successRateChart = new ApexCharts(document.querySelector("#successRateChart"), successRateChartOptions);
+        await Promise.all([
+          tributeChart.render(),
+          statusChart.render(),
+          successRateChart.render()
+        ]);
+        processRawData();
+        populateFilters();
+        loadState();
+        setupEventListeners();
+        applyFiltersAndRender();
+        // Force a redraw after initial load to fix rendering bugs
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 300);
+      }
+      // --- DOM & EVENT HANDLING ---
+      function populateFilters() {
+        const getUniqueValues = (key) => [...new Set(masterData.map(item => item[key]))].sort();
+        const populateSelect = (elementId, values) => {
+          const select = document.getElementById(elementId);
+          const savedValue = select.value;
+          select.innerHTML = '<option value="">' + select.firstElementChild.textContent + '</option>';
+          values.forEach(value => select.add(new Option(value, value)));
+          select.value = savedValue;
+        };
+        populateSelect('regimeFilter', getUniqueValues('regime'));
+        populateSelect('tributoFilter', getUniqueValues('tributo'));
+        populateSelect('statusFilter', getUniqueValues('situacao'));
+      }
+
+      function setupEventListeners() {
+        document.querySelectorAll('#searchInput, #regimeFilter, #tributoFilter, #statusFilter').forEach(el => {
+          el.addEventListener('input', () => {
+            setTimeout(applyFiltersAndRender, 200);
+          });
+        });
+        document.getElementById('clearFiltersBtn').addEventListener('click', clearStateAndFilters);
+        document.querySelectorAll('#dataTable th').forEach(th => {
+          th.addEventListener('click', () => {
+            const column = th.dataset.column;
+            if (!column) return;
+            const isAsc = sortConfig.column === column && sortConfig.direction === 'asc';
+            sortConfig = {
+              column,
+              direction: isAsc ? 'desc' : 'asc'
+            };
+            applyFiltersAndRender();
+          });
+        });
+      }
+      // --- DATA PROCESSING & RENDERING ---
+      function applyFiltersAndRender() {
+        const filters = {
+          search: document.getElementById('searchInput').value.toLowerCase(),
+          regime: document.getElementById('regimeFilter').value,
+          tributo: document.getElementById('tributoFilter').value,
+          status: document.getElementById('statusFilter').value,
+        };
+        filteredData = masterData.filter(item =>
+          (!filters.regime || item.regime === filters.regime) &&
+          (!filters.tributo || item.tributo === filters.tributo) &&
+          (!filters.status || item.situacao === filters.status) &&
+          (!filters.search ||
+            Object.values(item).some(val =>
+              String(val).toLowerCase().includes(filters.search)
+            )
+          )
+        );
+        filteredData.sort((a, b) => {
+          const col = sortConfig.column;
+          const dir = sortConfig.direction === 'asc' ? 1 : -1;
+          const valA = a[col];
+          const valB = b[col];
+          if (typeof valA === 'number') {
+            return (valA - valB) * dir;
+          }
+          return String(valA).localeCompare(String(valB)) * dir;
+        });
+        updateAll();
+        saveState();
+      }
+      // --- MASTER UPDATE FUNCTION ---
+      function updateAll() {
+        updateKPIs();
+        updateCharts();
+        populateTable();
+        updateSortIcons();
+      }
+
+      function updateKPIs() {
+        const restituido = filteredData.filter(item => item.situacao === 'RESTITUÍDO');
+        const pendente = filteredData.filter(item => item.situacao !== 'RESTITUÍDO');
+        const totalRestituido = restituido.reduce((sum, item) => sum + item.valor, 0);
+        const totalPendente = pendente.reduce((sum, item) => sum + item.valor, 0);
+        const totalGeral = totalRestituido + totalPendente;
+        document.getElementById('kpi-restituido-valor').textContent = formatCurrency(totalRestituido);
+        document.getElementById('kpi-restituido-proc').textContent = `${restituido.length} processos`;
+        document.getElementById('kpi-pendente-valor').textContent = formatCurrency(totalPendente);
+        document.getElementById('kpi-pendente-proc').textContent = `${pendente.length} processos`;
+        document.getElementById('kpi-geral-valor').textContent = formatCurrency(totalGeral);
+        document.getElementById('kpi-geral-proc').textContent = `${filteredData.length} processos`;
+      }
+
+      function updateCharts() {
+        // Tribute Chart (Doughnut)
+        const tributeData = filteredData.reduce((acc, item) => {
+          acc[item.tributo] = (acc[item.tributo] || 0) + item.valor;
+          return acc;
+        }, {});
+        const tributeLabels = Object.keys(tributeData);
+        const tributeSeries = Object.values(tributeData);
+        tributeChart.updateOptions({
+          series: tributeSeries,
+          labels: tributeLabels
+        });
+        // Status Chart (Bar)
+        const statusData = filteredData.reduce((acc, item) => {
+          const key = item.situacao === 'RESTITUÍDO' ? 'Restituído' : 'Pendente';
+          acc[key] = (acc[key] || 0) + item.valor;
+          return acc;
+        }, {
+          'Restituído': 0,
+          'Pendente': 0
+        });
+        statusChart.updateOptions({
+          series: [{
+            name: 'Valor',
+            data: Object.values(statusData)
+          }],
+          xaxis: {
+            categories: Object.keys(statusData)
+          }
+        });
+        // Success Rate Chart (Radial)
+        const totalRestituido = statusData['Restituído'] || 0;
+        const totalGeral = totalRestituido + (statusData['Pendente'] || 0);
+        const successRate = totalGeral > 0 ? (totalRestituido / totalGeral) * 100 : 0;
+        successRateChart.updateSeries([successRate]);
+      }
+
+      function populateTable() {
+        const tbody = document.querySelector('#dataTable tbody');
+        const noResultsDiv = document.getElementById('no-results');
+        tbody.innerHTML = ''; // Clear table
+        if (filteredData.length === 0) {
+          noResultsDiv.classList.remove('hidden');
+          return;
+        }
+        noResultsDiv.classList.add('hidden');
+        const rows = filteredData.map(item => {
+          const statusClass = item.situacao === 'RESTITUÍDO' ?
+            'bg-emerald-100 text-emerald-800' :
+            'bg-amber-100 text-amber-800';
+          return `
+                <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                    <td class="p-4 font-medium text-slate-800">${item.tributo}</td>
+                    <td class="p-4"><span class="px-3 py-1 text-xs font-bold rounded-full ${statusClass}">${item.situacao}</span></td>
+                    <td class="p-4 text-right font-mono text-slate-600">${formatCurrency(item.valor)}</td>
+                    <td class="p-4 text-slate-600">${item.regime}</td>
+                    <td class="p-4 font-mono text-slate-500">${item.perdcomp}</td>
+                </tr>
+            `;
+        }).join('');
+        tbody.innerHTML = rows;
+      }
+
+      function updateSortIcons() {
+        document.querySelectorAll('#dataTable th .sort-icon').forEach(icon => {
+          icon.classList.remove('fa-sort-up', 'fa-sort-down', 'active');
+          icon.classList.add('fa-sort');
+        });
+        const currentTh = document.querySelector(`#dataTable th[data-column="${sortConfig.column}"]`);
+        if (currentTh) {
+          const icon = currentTh.querySelector('.sort-icon');
+          icon.classList.remove('fa-sort');
+          icon.classList.add(sortConfig.direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down', 'active');
+        }
+      }
+      // --- START THE APPLICATION ---
+      init();
+    });
+  </script>
+
+</body>
+
+</html>
